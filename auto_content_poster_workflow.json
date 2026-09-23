@@ -1,0 +1,320 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://muslimmatters.org/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        -640
+      ],
+      "id": "e049e2e5-9714-4cb7-b836-5462671f02c7",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1XkVP6R9aP6aeS2Xd5hUguGjHtzea4_l0ow92VgGLzjY",
+          "mode": "list",
+          "cachedResultName": "week 23 bot memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XkVP6R9aP6aeS2Xd5hUguGjHtzea4_l0ow92VgGLzjY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XkVP6R9aP6aeS2Xd5hUguGjHtzea4_l0ow92VgGLzjY/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Artical Link",
+              "lookupValue": "={{ $json.link }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        -544
+      ],
+      "id": "bacf02f5-73f8-4615-a3db-9ecc32504a60",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true
+      
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        224,
+        -544
+      ],
+      "id": "3b611bde-a2ba-41fd-a212-fb5d95623be0",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "83981649-9541-4f17-aa4c-0cfc3a8e83c6",
+              "leftValue": "={{ $json[\"Artical Link \"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        -304
+      ],
+      "id": "e17a4d59-59ce-492f-88ff-29f31b1e5684",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1XkVP6R9aP6aeS2Xd5hUguGjHtzea4_l0ow92VgGLzjY",
+          "mode": "list",
+          "cachedResultName": "week 23 bot memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XkVP6R9aP6aeS2Xd5hUguGjHtzea4_l0ow92VgGLzjY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XkVP6R9aP6aeS2Xd5hUguGjHtzea4_l0ow92VgGLzjY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Artical Link": "={{ $('RSS Read').item.json.link }}"
+          },
+          "matchingColumns": [
+            "Artical Link "
+          ],
+          "schema": [
+            {
+              "id": "Artical Link",
+              "displayName": "Artical Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        768,
+        -704
+      ],
+      "id": "2bcc3f45-1a27-40df-9107-f59f089894f6",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "0hczpjSGd9I3i9xO",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=Islamic Rss :  {{ $('RSS Read').item.json.link }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -160
+      ],
+      "id": "59ec8954-4b48-4380-8f98-53ddf5810252",
+      "name": "Discord",
+      "webhookId": "557c21d3-b98a-40ec-994d-2c7122074408"
+      
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        -512
+      ],
+      "id": "58cd733b-2d69-46b8-8f06-5e19f9c2f4ea",
+      "name": "Wait",
+      "webhookId": "ecea5df3-d539-48be-93cd-cb3c8fdd9f9d"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -224,
+        -320
+      ],
+      "id": "88051fd9-c45e-4956-9819-733cd0829569",
+      "name": "Schedule Trigger",
+      "executeOnce": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f96f16cc-82ca-4494-b747-128052d113f3",
+  
+  "nodeGroups": [],
+  "id": "SPb9hQC19bbj1GRA",
+  "tags": []
+}
